@@ -1,5 +1,8 @@
 'use strict';
 
+var clientID = ["1466584765725","1466584765726"];
+var noOfClients = 0;
+
 const express = require('express');
 const SocketServer = require('ws').Server;
 const path = require('path');
@@ -14,12 +17,15 @@ const server = express()
 const wss = new SocketServer({ server });
 
 wss.on('connection', (ws) => {
-  console.log('Client connected');
+  ws.clientId = new Date().getTime();//Setting id for each client
+  console.log('Client connected --- ID :'+ws.clientId);
   ws.on('close', () => console.log('Client disconnected'));
 });
 
 setInterval(() => {
   wss.clients.forEach((client) => {
     client.send(new Date().toTimeString());
+    //console.log("Client ID ::"+client.clientId);
   });
+
 }, 1000);
