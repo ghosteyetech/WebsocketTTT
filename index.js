@@ -19,7 +19,7 @@ const wss = new SocketServer({ server });
 wss.on('connection', (ws) => {
   ws.clientId = new Date().getTime();//Setting id for each client
   console.log('Client connected --- ID :'+ws.clientId);
-  ws.on('close', () => console.log('Client disconnected'));
+  ws.on('close', () => console.log('Client disconnected--- ID :'+ws.clientId));
 });
 
 setInterval(() => {
