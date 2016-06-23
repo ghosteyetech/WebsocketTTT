@@ -12,7 +12,7 @@ pg.defaults.ssl = true;
 
 var connectionString = "postgres://exxufairgmxepd:9WQuu8MpVF_TGzsrCXWrKd9ik6@ec2-54-221-226-148.compute-1.amazonaws.com:5432:/d1f2crurbl7a0v"
 
-pg.connect(connectionString, function(err, client, done) {
+pg.connect(process.env.DATABASE_URL, function(err, client, done) {
    client.query('SELECT * FROM onlineUsers', function(err, result) {
       done();
       if(err) return console.error(err);
