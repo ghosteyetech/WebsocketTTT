@@ -7,6 +7,19 @@ const express = require('express');
 const SocketServer = require('ws').Server;
 const path = require('path');
 
+var pg = require('pg');
+pg.defaults.ssl = true;
+
+var connectionString = "postgres://exxufairgmxepd:9WQuu8MpVF_TGzsrCXWrKd9ik6@ec2-54-221-226-148.compute-1.amazonaws.com:5432:/d1f2crurbl7a0v"
+
+pg.connect(connectionString, function(err, client, done) {
+   client.query('SELECT * FROM onlineUsers', function(err, result) {
+      done();
+      if(err) return console.error(err);
+      console.log(result.rows);
+   });
+});
+
 const PORT = process.env.PORT || 3000;
 const INDEX = path.join(__dirname, 'indexx.html');
 
