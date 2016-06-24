@@ -7,16 +7,16 @@ const express = require('express');
 const SocketServer = require('ws').Server;
 const path = require('path');
 
-var pg = require('pg');
-pg.defaults.ssl = true;
-
-pg.connect(process.env.DATABASE_URL, function(err, client, done) {
-   client.query('SELECT * FROM onlineUsers', function(err, result) {
-      done();
-      if(err) return console.error(err);
-      console.log(result.rows);
-   });
-});
+// var pg = require('pg');
+// pg.defaults.ssl = true;
+//
+// pg.connect(process.env.DATABASE_URL, function(err, client, done) {
+//    client.query('SELECT * FROM onlineUsers', function(err, result) {
+//       done();
+//       if(err) return console.error(err);
+//       console.log(result.rows);
+//    });
+// });
 
 const PORT = process.env.PORT || 3000;
 const INDEX = path.join(__dirname, 'indexx.html');
@@ -27,19 +27,38 @@ const server = express()
 
 const wss = new SocketServer({ server });
 
+//---------
+function SebdDataToClient(msg, client_ID){
+  var opponentPlayer = null;
+  switch (client_ID) {
+    case clientID[0]: opponentPlayer = clientID[1];
+      break;
+    case clientID[1]: opponentPlayer = clientID[0];
+      break;
+  }
+
+  wss.clients.forEach((client) => {
+      //console.log("Client ID ::"+client.clientId);
+      if(client.clientId == opponentPlayer){
+          client.send("Player: "+client_ID+" Data: "+msg);
+      }
+  });
+
+}
+//---------
 wss.on('connection', (ws) => {
-  ws.clientId = new Date().getTime();//Setting id for each client
+  //ws.clientId = new Date().getTime();//Setting id for each client
+  if(noOfClients < 2){
+    ws.clientId = clientID[noOfClients];
+    noOfClients++;
+  }else{
+    ws.clientId = new Date().getTime();//Setting id for each client
+  }
   console.log('Client connected --- ID :'+ws.clientId);
 
   ws.on('message',(msg) =>{
     console.log("Got msg :::" + msg);
-
-    if(wss.clients[0]){
-      wss.clients[0].send("MsgFrom :"+ws.clientId+" Data: "+msg);
-    }else{
-      console.log("Only one client remain");
-    }
-
+    SebdDataToClient(msg,ws.clientId);
   });
 
   ws.on('close', () => console.log('Client disconnected'));
