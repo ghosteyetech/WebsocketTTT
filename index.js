@@ -1,7 +1,6 @@
 'use strict';
 
-var clientID = ["1466584765725","1466584765726"];
-var noOfClients = 0;
+var client_IDs = [];//["1466584765725","1466584765726"];
 
 const express = require('express');
 const SocketServer = require('ws').Server;
@@ -28,12 +27,12 @@ const server = express()
 const wss = new SocketServer({ server });
 
 //---------
-function SebdDataToClient(msg, client_ID){
+function SenddDataToClient(msg, client_ID){
   var opponentPlayer = null;
   switch (client_ID) {
-    case clientID[0]: opponentPlayer = clientID[1];
+    case client_IDs[0]: opponentPlayer = client_IDs[1];
       break;
-    case clientID[1]: opponentPlayer = clientID[0];
+    case client_IDs[1]: opponentPlayer = client_IDs[0];
       break;
   }
 
@@ -47,27 +46,35 @@ function SebdDataToClient(msg, client_ID){
 }
 //---------
 wss.on('connection', (ws) => {
-  //ws.clientId = new Date().getTime();//Setting id for each client
-  if(noOfClients < 2){
-    ws.clientId = clientID[noOfClients];
-    noOfClients++;
-  }else{
-    ws.clientId = new Date().getTime();//Setting id for each client
-  }
+  ws.clientId = new Date().getTime();//Setting id for each client
+  client_IDs.push(ws.clientId);
+
   console.log('Client connected --- ID :'+ws.clientId);
 
   ws.on('message',(msg) =>{
     console.log("Got msg :::" + msg);
-    SebdDataToClient(msg,ws.clientId);
+    SenddDataToClient(msg,ws.clientId);
   });
 
-  ws.on('close', () => console.log('Client disconnected'));
+  ws.on('close', () => {
+      console.log('Client disconnected');
+      var index = client_IDs.indexOf(ws.clientId);
+      if (index > -1) {
+        client_IDs.splice(index, 1);
+        console.log('Client ID successfully removed');
+      }else{
+        console.log('Client ID remove faild');
+      }
+  });
+
 });
 
 /*setInterval(() => {
+  noOfClients = 0;
   wss.clients.forEach((client) => {
-    client.send(new Date().toTimeString());
+    //client.send(new Date().toTimeString());
     //console.log("Client ID ::"+client.clientId);
+    noOfClients++;
   });
-
+  //console.log("# Clients  ::"+noOfClients);
 }, 1000);*/
