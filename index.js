@@ -10,8 +10,6 @@ const path = require('path');
 var pg = require('pg');
 pg.defaults.ssl = true;
 
-var connectionString = "postgres://exxufairgmxepd:9WQuu8MpVF_TGzsrCXWrKd9ik6@ec2-54-221-226-148.compute-1.amazonaws.com:5432:/d1f2crurbl7a0v"
-
 pg.connect(process.env.DATABASE_URL, function(err, client, done) {
    client.query('SELECT * FROM onlineUsers', function(err, result) {
       done();
@@ -35,15 +33,22 @@ wss.on('connection', (ws) => {
 
   ws.on('message',(msg) =>{
     console.log("Got msg :::" + msg);
+
+    if(wss.clients[0]){
+      wss.clients[0].send("MsgFrom :"+ws.clientId+" Data: "+msg);
+    }else{
+      console.log("Only one client remain");
+    }
+
   });
 
   ws.on('close', () => console.log('Client disconnected'));
 });
 
-setInterval(() => {
+/*setInterval(() => {
   wss.clients.forEach((client) => {
     client.send(new Date().toTimeString());
     //console.log("Client ID ::"+client.clientId);
   });
 
-}, 1000);
+}, 1000);*/
