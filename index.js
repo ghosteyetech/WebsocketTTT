@@ -39,7 +39,8 @@ function SenddDataToClient(msg, client_ID){
   wss.clients.forEach((client) => {
       //console.log("Client ID ::"+client.clientId);
       if(client.clientId == opponentPlayer){
-          client.send("Player: "+client_ID+" Data: "+msg);
+          var resData = {"YourID" : client_ID, "opponentPlayer": opponentPlayer, "Box": msg};
+          client.send(resData);
       }
   });
 
