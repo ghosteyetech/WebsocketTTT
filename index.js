@@ -41,11 +41,11 @@ function SenddDataToClient(msg, client_ID){
       try {
           var json = JSON.parse(msg);
           console.log("Message :");
-          console.log(json);
+          console.log(json.data);
 
           if(json.data != 'ping'){
             if(client.clientId == opponentPlayer){
-                var resData = JSON.stringify({"YourID" : client_ID+"", "opponentPlayer": opponentPlayer+"", "Box": msg});
+                var resData = JSON.stringify({"YourID" : client_ID+"", "opponentPlayer": opponentPlayer+"", "Box": json.data});
                 client.send(resData);
             }
           }
